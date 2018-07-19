@@ -1,7 +1,5 @@
 #include <iostream>
-#include <string>
 #include <optional>
-#include <cassert>
 
 #ifndef _STACK_H_
 #define _STACK_H_
@@ -32,7 +30,7 @@ public:
 	void pop();
 	bool empty() const;
 	void show() const;
-	std::optional<Type> top() const;
+	const std::optional<Type> & top() const;
 	size_t size() const;
 };
 //-------------------------------------------------------------------------------------------------
@@ -127,7 +125,7 @@ void Stack<Type>::show() const
 {
 	if (empty())
 	{
-		std::cout << "Stack is empty! \n";
+		std::cerr << "Stack is empty! \n";
 	}
 	else
 	{
@@ -139,7 +137,7 @@ void Stack<Type>::show() const
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-std::optional<Type> Stack<Type>::top() const
+const std::optional<Type> & Stack<Type>::top() const
 {
 	if (!empty())
 	{
