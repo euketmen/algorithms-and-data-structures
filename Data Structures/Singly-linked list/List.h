@@ -158,21 +158,38 @@ void List<Type>::push_back(const Type & tp)
 template <typename Type>
 void List<Type>::push_pos(const Type & tp, const size_t & pos)
 {
-	if (empty())
+	if (empty() || pos == 0)
 	{
 		push_front(tp);
 		return;
 	}
-	
-	Node* n_ptr_new = new Node;
-	n_ptr_new->element = tp;
 
-	for (size_t i = 0; i < pos; ++i)
+	if (pos == count)
 	{
-		head = head->next;
+		push_back(tp);
+		return;
 	}
 
-	//Node* n_ptr_old = head;
+	if (pos < count && pos > 0)
+	{
+		Node* n_ptr_new = new Node;
+		Node* n_ptr_prev = nullptr;
+		Node* n_ptr_cur = head;
+		n_ptr_new->element = tp;
+	
+		for (size_t i = 0; i < pos; ++i)
+		{
+			n_ptr_prev = n_ptr_cur;
+			n_ptr_cur = n_ptr_cur->next;
+		}
+		n_ptr_prev->next = n_ptr_new;
+		n_ptr_new->next = n_ptr_cur;
+		++count;
+	}
+	else
+	{
+		throw std::out_of_range("Invalid position");
+	}
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
@@ -233,12 +250,35 @@ void List<Type>::pop_pos(const size_t & pos)
 		throw std::out_of_range("Can't pop from empty list");
 	}
 
-	if (head == tail)
+	if (pos == 0)
 	{
-		delete head;
-		head = nullptr;
-		tail = nullptr;
+		pop_front();
 		return;
+	}
+	else
+	if (pos == --count)
+	{
+		pop_back();
+		return;
+	}
+
+	if (pos < count && pos > 0)
+	{
+		Node* n_ptr_prev = nullptr;
+		Node* n_ptr_cur = head;
+
+		for (size_t i = 0; i < pos; ++i)
+		{
+			n_ptr_prev = n_ptr_cur;
+			n_ptr_cur = n_ptr_cur->next;
+		}
+		n_ptr_prev->next = n_ptr_cur->next;
+		--count;
+		delete n_ptr_cur;
+	}
+	else
+	{
+		throw std::out_of_range("Invalid position");
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -271,7 +311,7 @@ const std::optional<Type> & List<Type>::back() const
 template <typename Type>
 std::ostream & operator << (std::ostream & os, const List<Type> & lst)
 {
-	
+	lst.show();
 	return os;
 }
 //-------------------------------------------------------------------------------------------------
@@ -280,7 +320,7 @@ void List<Type>::show() const
 {
 	if (empty())
 	{
-		std::cout << "Stack is empty! \n";
+		std::cerr << "Stack is empty!" << std::endl;
 	}
 	else
 	{
