@@ -50,10 +50,11 @@ List<Type>::List() : count(0), head(nullptr)
 template <typename Type>
 List<Type>::List(const List & lst) : count(lst.count), head(nullptr)
 {
-	for (const Node* n_ptr = lst.head; n_ptr->next != lst.head; n_ptr = n_ptr->next)
+	const Node* n_ptr_rvl = lst.head;
+	for (size_t i = 0; i < lst.count; ++i)
 	{
 		Node* n_ptr_new = new Node;
-		n_ptr_new->element = n_ptr->element;
+		n_ptr_new->element = n_ptr_rvl->element;
 		if (head == nullptr)
 		{
 			head = n_ptr_new;
@@ -69,6 +70,7 @@ List<Type>::List(const List & lst) : count(lst.count), head(nullptr)
 			n_ptr_new->next = head;
 			n_ptr_tmp->next = n_ptr_new;
 		}
+		n_ptr_rvl = n_ptr_rvl->next;
 	}
 }
 //-------------------------------------------------------------------------------------------------
@@ -212,13 +214,19 @@ void List<Type>::pop_front()
 		throw std::out_of_range("Can't pop from empty list");
 	}
 	
-	if (head == tail)
+	if (head->next == head)
 	{
 		delete head;
 		head = nullptr;
-		tail = nullptr;
 		return;
 	}
+
+	Node* n_ptr_tmp = head;
+	while (n_ptr_tmp->next != head)
+	{
+		n_ptr_tmp = n_ptr_tmp->next;
+	}
+	n_ptr_tmp->next = head->next;
 
 	Node* n_ptr = head;
 	head = head->next;
@@ -234,24 +242,23 @@ void List<Type>::pop_back()
 		throw std::out_of_range("Can't pop from empty list");
 	}
 
-	if (head == tail)
+	if (head->next == head)
 	{
 		delete head;
 		head = nullptr;
-		tail = nullptr;
 		return;
 	}
 
 	Node* n_ptr = head;
-	while (n_ptr->next != tail)
+	Node* n_ptr_prev = nullptr;
+	while (n_ptr->next != head)
 	{
+		n_ptr_prev = n_ptr;
 		n_ptr = n_ptr->next;
 	}
+	n_ptr_prev->next = head;
 	--count;
-	delete tail;
-
-	tail = n_ptr;
-	tail->next = nullptr;
+	delete n_ptr;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
@@ -268,7 +275,7 @@ void List<Type>::pop_pos(const size_t & pos)
 		return;
 	}
 	else
-	if (pos == --count)
+	if (pos == count - 1)
 	{
 		pop_back();
 		return;
@@ -317,7 +324,14 @@ const std::optional<Type> & List<Type>::back() const
 	{
 		return std::nullopt;
 	}
-	return tail->element;
+
+	Node* n_ptr_tmp = head;
+	while (n_ptr_tmp->next != head)
+	{
+		n_ptr_tmp = n_ptr_tmp->next;
+	}
+
+	return n_ptr_tmp->element;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
@@ -336,12 +350,12 @@ void List<Type>::show() const
 	}
 	else
 	{
-		Node* n_ptr = nullptr;
-		for (n_ptr = head; n_ptr->next != head; n_ptr = n_ptr->next)
+		Node* n_ptr = head;
+		for (size_t i = 0; i < count; ++i)
 		{
 			std::cout << n_ptr->element << std::endl;
+			n_ptr = n_ptr->next;
 		}
-		std::cout << n_ptr->element << std::endl;
 	}
 }
 //-------------------------------------------------------------------------------------------------

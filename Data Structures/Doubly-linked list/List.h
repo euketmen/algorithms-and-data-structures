@@ -265,7 +265,7 @@ void List<Type>::pop_pos(const size_t & pos)
 		return;
 	}
 	else
-	if (pos == --count)
+	if (pos == count - 1)
 	{
 		pop_back();
 		return;
