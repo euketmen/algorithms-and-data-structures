@@ -11,6 +11,7 @@ private:
 	struct Node
 	{
 		Type element = {};
+		Node* prev = nullptr;
 		Node* next = nullptr;
 	};
 	size_t count;
@@ -58,17 +59,20 @@ List<Type>::List(const List & lst) : count(lst.count), head(nullptr)
 		if (head == nullptr)
 		{
 			head = n_ptr_new;
+			head->prev = head;
 			head->next = head;
 		}
 		else
 		{
-			Node* n_ptr_tmp = head;
-			while (n_ptr_tmp->next != head)
+			Node* n_ptr_lst = head;
+			while (n_ptr_lst->next != head)
 			{
-				n_ptr_tmp = n_ptr_tmp->next;
+				n_ptr_lst = n_ptr_lst->next;
 			}
+			n_ptr_lst->next = n_ptr_new;
+			n_ptr_new->prev = n_ptr_lst;
 			n_ptr_new->next = head;
-			n_ptr_tmp->next = n_ptr_new;
+			head->prev = n_ptr_new;
 		}
 		n_ptr_rvl = n_ptr_rvl->next;
 	}
@@ -128,18 +132,21 @@ void List<Type>::push_front(const Type & tp)
 	if (head == nullptr)
 	{
 		head = n_ptr_new;
+		head->prev = head;
 		head->next = head;
 	}
 	else
 	{
-		Node* n_ptr_tmp = head;
-		while (n_ptr_tmp->next != head)
+		Node* n_ptr_lst = head;
+		while (n_ptr_lst->next != head)
 		{
-			n_ptr_tmp = n_ptr_tmp->next;
+			n_ptr_lst = n_ptr_lst->next;
 		}
 		n_ptr_new->next = head;
+		head->prev = n_ptr_new;
+		n_ptr_new->prev = n_ptr_lst;
+		n_ptr_lst->next = n_ptr_new;
 		head = n_ptr_new;
-		n_ptr_tmp->next = head;
 	}
 	++count;
 }
@@ -152,17 +159,20 @@ void List<Type>::push_back(const Type & tp)
 	if (head == nullptr)
 	{
 		head = n_ptr_new;
+		head->prev = head;
 		head->next = head;
 	}
 	else
 	{
-		Node* n_ptr_tmp = head;
-		while (n_ptr_tmp->next != head)
+		Node* n_ptr_lst = head;
+		while (n_ptr_lst->next != head)
 		{
-			n_ptr_tmp = n_ptr_tmp->next;
+			n_ptr_lst = n_ptr_lst->next;
 		}
+		n_ptr_lst->next = n_ptr_new;
+		n_ptr_new->prev = n_ptr_lst;
 		n_ptr_new->next = head;
-		n_ptr_tmp->next = n_ptr_new;
+		head->prev = n_ptr_new;
 	}
 	++count;
 }
@@ -195,7 +205,9 @@ void List<Type>::push_pos(const Type & tp, const size_t & pos)
 			n_ptr_cur = n_ptr_cur->next;
 		}
 		n_ptr_prev->next = n_ptr_new;
+		n_ptr_new->prev = n_ptr_prev;
 		n_ptr_new->next = n_ptr_cur;
+		n_ptr_cur->prev = n_ptr_new;
 		++count;
 	}
 	else
@@ -219,15 +231,16 @@ void List<Type>::pop_front()
 		return;
 	}
 
-	Node* n_ptr_tmp = head;
-	while (n_ptr_tmp->next != head)
+	Node* n_ptr_lst = head;
+	while (n_ptr_lst->next != head)
 	{
-		n_ptr_tmp = n_ptr_tmp->next;
+		n_ptr_lst = n_ptr_lst->next;
 	}
-	n_ptr_tmp->next = head->next;
+	n_ptr_lst->next = head->next;
 
 	Node* n_ptr = head;
 	head = head->next;
+	head->prev = n_ptr_lst;
 	--count;
 	delete n_ptr;
 }
@@ -255,6 +268,7 @@ void List<Type>::pop_back()
 		n_ptr = n_ptr->next;
 	}
 	n_ptr_prev->next = head;
+	head->prev = n_ptr_prev;
 	--count;
 	delete n_ptr;
 }
@@ -290,6 +304,7 @@ void List<Type>::pop_pos(const size_t & pos)
 			n_ptr_cur = n_ptr_cur->next;
 		}
 		n_ptr_prev->next = n_ptr_cur->next;
+		n_ptr_cur->prev = n_ptr_prev;
 		--count;
 		delete n_ptr_cur;
 	}

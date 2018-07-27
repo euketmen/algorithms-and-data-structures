@@ -128,7 +128,6 @@ void List<Type>::push_front(const Type & tp)
 	{
 		head = n_ptr_new;
 		tail = head;
-		n_ptr_new = nullptr;
 	}
 	else
 	{
@@ -149,7 +148,6 @@ void List<Type>::push_back(const Type & tp)
 	{
 		head = n_ptr_new;
 		tail = head;
-		n_ptr_new = nullptr;
 	}
 	else
 	{
