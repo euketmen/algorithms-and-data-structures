@@ -17,6 +17,7 @@ private:
 	size_t count;
 	Node* head;
 public:
+	//Member functions
 	List();
 	List(const List & lst);
 	List(List && lst);
@@ -24,9 +25,19 @@ public:
 	List & operator = (List && lst);
 	~List();
 
-	template <typename Type>
-	friend std::ostream & operator << (std::ostream & os, const List & lst);
+	//Element access
+	const Type & front() const;
+	const Type & back() const;
 
+	//Iterators
+	//TODO: Implement in the near future
+
+	//Capacity
+	bool empty() const;
+	size_t size() const;
+	//size_type max_size() const noexcept; Not implemented
+
+	//Modifiers
 	void push_front(const Type & tp);
 	void push_back(const Type & tp);
 	void push_pos(const Type & tp, const size_t & pos);
@@ -34,12 +45,14 @@ public:
 	void pop_front();
 	void pop_back();
 	void pop_pos(const size_t & pos);
-	
-	bool empty() const;
-	const std::optional<Type> & front() const;
-	const std::optional<Type> & back() const;
 
-	void show() const;
+	//emplace_front Not implemented
+	//emplace_back Not implemented
+	//emplace Not implemented
+
+	void clear() noexcept;
+	//erase Not implemented
+	void swap(List & lst) noexcept;
 };
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
@@ -51,9 +64,9 @@ List<Type>::List() : count(0), head(nullptr)
 template <typename Type>
 List<Type>::List(const List & lst) : count(lst.count), head(nullptr)
 {
-	const Node* n_ptr_rvl = lst.head;
 	for (size_t i = 0; i < lst.count; ++i)
 	{
+		Node* n_ptr_rvl = lst.head;
 		Node* n_ptr_new = new Node;
 		n_ptr_new->element = n_ptr_rvl->element;
 		if (head == nullptr)
@@ -117,9 +130,9 @@ List<Type>::~List()
 {
 	while (head)
 	{
-		Node* n_ptr = head;
+		Node* n_ptr_del = head;
 		head = head->next;
-		delete n_ptr;
+		delete n_ptr_del;
 	}
 	count = 0;
 }
@@ -196,18 +209,18 @@ void List<Type>::push_pos(const Type & tp, const size_t & pos)
 	{
 		Node* n_ptr_new = new Node;
 		Node* n_ptr_prev = nullptr;
-		Node* n_ptr_cur = head;
+		Node* n_ptr_lst = head;
 		n_ptr_new->element = tp;
 	
 		for (size_t i = 0; i < pos; ++i)
 		{
-			n_ptr_prev = n_ptr_cur;
-			n_ptr_cur = n_ptr_cur->next;
+			n_ptr_prev = n_ptr_lst;
+			n_ptr_lst = n_ptr_lst->next;
 		}
 		n_ptr_prev->next = n_ptr_new;
 		n_ptr_new->prev = n_ptr_prev;
-		n_ptr_new->next = n_ptr_cur;
-		n_ptr_cur->prev = n_ptr_new;
+		n_ptr_new->next = n_ptr_lst;
+		n_ptr_lst->prev = n_ptr_new;
 		++count;
 	}
 	else
@@ -227,6 +240,7 @@ void List<Type>::pop_front()
 	if (head->next == head)
 	{
 		delete head;
+		--count;
 		head = nullptr;
 		return;
 	}
@@ -238,11 +252,11 @@ void List<Type>::pop_front()
 	}
 	n_ptr_lst->next = head->next;
 
-	Node* n_ptr = head;
+	Node* n_ptr_del = head;
 	head = head->next;
 	head->prev = n_ptr_lst;
 	--count;
-	delete n_ptr;
+	delete n_ptr_del;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
@@ -256,21 +270,22 @@ void List<Type>::pop_back()
 	if (head->next == head)
 	{
 		delete head;
+		--count;
 		head = nullptr;
 		return;
 	}
 
-	Node* n_ptr = head;
 	Node* n_ptr_prev = nullptr;
-	while (n_ptr->next != head)
+	Node* n_ptr_lst = head;
+	while (n_ptr_lst->next != head)
 	{
-		n_ptr_prev = n_ptr;
-		n_ptr = n_ptr->next;
+		n_ptr_prev = n_ptr_lst;
+		n_ptr_lst = n_ptr_lst->next;
 	}
 	n_ptr_prev->next = head;
 	head->prev = n_ptr_prev;
 	--count;
-	delete n_ptr;
+	delete n_ptr_lst;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
@@ -296,17 +311,16 @@ void List<Type>::pop_pos(const size_t & pos)
 	if (pos < count && pos > 0)
 	{
 		Node* n_ptr_prev = nullptr;
-		Node* n_ptr_cur = head;
-
+		Node* n_ptr_pos = head;
 		for (size_t i = 0; i < pos; ++i)
 		{
-			n_ptr_prev = n_ptr_cur;
-			n_ptr_cur = n_ptr_cur->next;
+			n_ptr_prev = n_ptr_pos;
+			n_ptr_pos = n_ptr_pos->next;
 		}
-		n_ptr_prev->next = n_ptr_cur->next;
-		n_ptr_cur->prev = n_ptr_prev;
+		n_ptr_prev->next = n_ptr_pos->next;
+		n_ptr_pos->prev = n_ptr_prev;
 		--count;
-		delete n_ptr_cur;
+		delete n_ptr_pos;
 	}
 	else
 	{
@@ -321,54 +335,52 @@ bool List<Type>::empty() const
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-const std::optional<Type> & List<Type>::front() const
+const Type & List<Type>::front() const
 {
 	if (empty())
 	{
-		return std::nullopt;
+		throw std::out_of_range("List<Type>::top: empty stack");
 	}
 	return head->element;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-const std::optional<Type> & List<Type>::back() const
+const Type & List<Type>::back() const
 {
 	if (empty())
 	{
-		return std::nullopt;
+		throw std::out_of_range("List<Type>::top: empty stack");
 	}
 
-	Node* n_ptr_tmp = head;
-	while (n_ptr_tmp->next != head)
+	Node* n_ptr_lst = head;
+	while (n_ptr_lst->next != head)
 	{
-		n_ptr_tmp = n_ptr_tmp->next;
+		n_ptr_lst = n_ptr_lst->next;
 	}
-	return n_ptr_tmp->element;
+	return n_ptr_lst->element;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-std::ostream & operator << (std::ostream & os, const List<Type> & lst)
+size_t List<Type>::size() const
 {
-	lst.show();
-	return os;
+	return count;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-void List<Type>::show() const
+void List<Type>::clear() noexcept
 {
-	if (empty())
+	while (count)
 	{
-		std::cerr << "Stack is empty!" << std::endl;
+		pop_back();
 	}
-	else
-	{
-		Node* n_ptr = head;
-		for (size_t i = 0; i < count; ++i)
-		{
-			std::cout << n_ptr->element << std::endl;
-			n_ptr = n_ptr->next;
-		}
-	}
+}
+//-------------------------------------------------------------------------------------------------
+template <typename Type>
+void List<Type>::swap(List & lst) noexcept
+{
+	List temp(lst);
+	lst = std::move(*this);
+	*this = std::move(temp);
 }
 //-------------------------------------------------------------------------------------------------
 #endif // _List_H_
