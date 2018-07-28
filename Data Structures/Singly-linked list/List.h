@@ -1,6 +1,3 @@
-#include <iostream>
-#include <optional>
-
 #ifndef _List_H_
 #define _List_H_
 //-------------------------------------------------------------------------------------------------
@@ -17,6 +14,7 @@ private:
 	Node* head;
 	Node* tail;
 public:
+	//Member functions
 	List();
 	List(const List & lst);
 	List(List && lst);
@@ -24,9 +22,19 @@ public:
 	List & operator = (List && lst);
 	~List();
 
-	template <typename Type>
-	friend std::ostream & operator << (std::ostream & os, const List & lst);
+	//Element access
+	const Type & front() const;
+	const Type & back() const;
 
+	//Iterators
+	//TODO: Implement in the near future
+
+	//Capacity
+	bool empty() const;
+	size_t size() const;
+	//size_type max_size() const noexcept; Not implemented
+
+	//Modifiers
 	void push_front(const Type & tp);
 	void push_back(const Type & tp);
 	void push_pos(const Type & tp, const size_t & pos);
@@ -34,12 +42,14 @@ public:
 	void pop_front();
 	void pop_back();
 	void pop_pos(const size_t & pos);
-	
-	bool empty() const;
-	const std::optional<Type> & front() const;
-	const std::optional<Type> & back() const;
 
-	void show() const;
+	//emplace_front Not implemented
+	//emplace_back Not implemented
+	//emplace Not implemented
+
+	void clear() noexcept;
+	//erase Not implemented
+	void swap(List & lst) noexcept;
 };
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
@@ -110,9 +120,9 @@ List<Type>::~List()
 {
 	while (head)
 	{
-		Node* n_ptr = head;
+		Node* n_ptr_del = head;
 		head = head->next;
-		delete n_ptr;
+		delete n_ptr_del;
 	}
 	count = 0;
 }
@@ -201,15 +211,16 @@ void List<Type>::pop_front()
 	if (head == tail)
 	{
 		delete head;
+		--count;
 		head = nullptr;
 		tail = nullptr;
 		return;
 	}
 
-	Node* n_ptr = head;
+	Node* n_ptr_del = head;
 	head = head->next;
 	--count;
-	delete n_ptr;
+	delete n_ptr_del;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
@@ -223,20 +234,21 @@ void List<Type>::pop_back()
 	if (head == tail)
 	{
 		delete head;
+		--count;
 		head = nullptr;
 		tail = nullptr;
 		return;
 	}
 
-	Node* n_ptr = head;
-	while (n_ptr->next != tail)
+	Node* n_ptr_lst = head;
+	while (n_ptr_lst->next != tail)
 	{
-		n_ptr = n_ptr->next;
+		n_ptr_lst = n_ptr_lst->next;
 	}
 	--count;
 	delete tail;
 
-	tail = n_ptr;
+	tail = n_ptr_lst;
 	tail->next = nullptr;
 }
 //-------------------------------------------------------------------------------------------------
@@ -263,16 +275,16 @@ void List<Type>::pop_pos(const size_t & pos)
 	if (pos < count && pos > 0)
 	{
 		Node* n_ptr_prev = nullptr;
-		Node* n_ptr_cur = head;
+		Node* n_ptr_pos = head;
 
 		for (size_t i = 0; i < pos; ++i)
 		{
-			n_ptr_prev = n_ptr_cur;
-			n_ptr_cur = n_ptr_cur->next;
+			n_ptr_prev = n_ptr_pos;
+			n_ptr_pos = n_ptr_pos->next;
 		}
-		n_ptr_prev->next = n_ptr_cur->next;
+		n_ptr_prev->next = n_ptr_pos->next;
 		--count;
-		delete n_ptr_cur;
+		delete n_ptr_pos;
 	}
 	else
 	{
@@ -287,46 +299,46 @@ bool List<Type>::empty() const
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-const std::optional<Type> & List<Type>::front() const
+size_t List<Type>::size() const
+{
+	return count;
+}
+//-------------------------------------------------------------------------------------------------
+template <typename Type>
+const Type & List<Type>::front() const
 {
 	if (empty())
 	{
-		return std::nullopt;
+		throw std::out_of_range("List<Type>::top: empty stack");
 	}
 	return head->element;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-const std::optional<Type> & List<Type>::back() const
+const Type & List<Type>::back() const
 {
 	if (empty())
 	{
-		return std::nullopt;
+		throw std::out_of_range("List<Type>::top: empty stack");
 	}
 	return tail->element;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-std::ostream & operator << (std::ostream & os, const List<Type> & lst)
+void List<Type>::clear() noexcept
 {
-	lst.show();
-	return os;
+	while (count)
+	{
+		pop_back();
+	}
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-void List<Type>::show() const
+void List<Type>::swap(List & lst) noexcept
 {
-	if (empty())
-	{
-		std::cerr << "Stack is empty!" << std::endl;
-	}
-	else
-	{
-		for (const Node* ptr = head; ptr != nullptr; ptr = ptr->next)
-		{
-			std::cout << ptr->element << '\n';
-		}
-	}
+	List temp(lst);
+	lst = std::move(*this);
+	*this = std::move(temp);
 }
 //-------------------------------------------------------------------------------------------------
 #endif // _List_H_
