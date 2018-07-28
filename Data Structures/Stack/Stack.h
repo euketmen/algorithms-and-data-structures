@@ -1,6 +1,3 @@
-#include <iostream>
-#include <optional>
-
 #ifndef _STACK_H_
 #define _STACK_H_
 //-------------------------------------------------------------------------------------------------
@@ -10,12 +7,13 @@ class Stack
 private:
 	struct Node
 	{
-		Type Element;
+		Type element = {};
 		Node* next = nullptr;
 	};
 	size_t count;
 	Node* tail;
 public:
+	//Member functions
 	Stack();
 	Stack(const Stack & stk);
 	Stack(Stack && stk);
@@ -23,34 +21,38 @@ public:
 	Stack & operator = (Stack && stk);
 	~Stack();
 	
-	template <typename Type>
-	friend std::ostream & operator << (std::ostream & os, const Stack & stk);
+	//Element access
+	const Type & top() const;
 
-	void push(Type val);
-	void pop();
+	//Capacity
 	bool empty() const;
-	void show() const;
-	const std::optional<Type> & top() const;
 	size_t size() const;
+
+	//Modifiers
+	void push(const Type & val);
+	void push(Type && val);
+	void swap(Stack & stk);
+	//emplace Not implemented
+	void pop();
 };
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
 Stack<Type>::Stack() : count(0), tail(nullptr)
 {
-
+	//Body of the constructor class
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
 Stack<Type>::Stack(const Stack & stk) : count(stk.count), tail(nullptr)
 {
-	Node **pnext = &tail;
+	Node **n_ptr_next = &tail;
 	for (const Node* n_ptr = stk.tail; n_ptr != nullptr; n_ptr = n_ptr->next)
 	{
 		Node* n_ptr_new = new Node(*n_ptr);
-		*pnext = n_ptr_new;
-		pnext = &n_ptr_new->next;
+		*n_ptr_next = n_ptr_new;
+		n_ptr_next = &n_ptr_new->next;
 	}
-	*pnext = nullptr;
+	*n_ptr_next = nullptr;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
@@ -68,10 +70,9 @@ Stack<Type> & Stack<Type>::operator = (const Stack & stk)
 		return *this;
 	}
 
-	Stack copy(stk);
-	std::swap(tail, copy.tail);
-	std::swap(count, copy.count);
-
+	Stack temp(stk);
+	std::swap(tail, temp.tail);
+	std::swap(count, temp.count);
 	return *this;
 }
 //-------------------------------------------------------------------------------------------------
@@ -85,7 +86,6 @@ Stack<Type> & Stack<Type>::operator = (Stack && stk)
 
 	std::swap(tail, stk.tail);
 	std::swap(count, stk.count);
-
 	return *this;
 }
 //-------------------------------------------------------------------------------------------------
@@ -94,56 +94,50 @@ Stack<Type>::~Stack()
 {
 	while (tail)
 	{
-		Node* n_ptr = tail;
+		Node* n_ptr_del = tail;
 		tail = tail->next;
-		delete n_ptr;
+		delete n_ptr_del;
 	}
 	count = 0;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-void Stack<Type>::push(Type val)
+void Stack<Type>::push(Type && val)
 {
-	Node* n_ptr = new Node;
-	n_ptr->Element = val;
+	Node* n_ptr_new = new Node;
+	n_ptr_new->element = val;
 	count++;
-	n_ptr->next = tail;
-	tail = n_ptr;
+	n_ptr_new->next = tail;
+	tail = n_ptr_new;
+}
+//-------------------------------------------------------------------------------------------------
+template <typename Type>
+void Stack<Type>::push(const Type & val)
+{
+	Node* n_ptr_new = new Node;
+	n_ptr_new->element = val;
+	count++;
+	n_ptr_new->next = tail;
+	tail = n_ptr_new;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
 void Stack<Type>::pop()
 {
-	Node* n_ptr = tail;
+	Node* n_ptr_del = tail;
 	tail = tail->next;
 	count--;
-	delete n_ptr;
+	delete n_ptr_del;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-void Stack<Type>::show() const
+const Type & Stack<Type>::top() const
 {
 	if (empty())
 	{
-		std::cerr << "Stack is empty! \n";
+		throw std::runtime_error("Stack<Type>::top: empty stack");
 	}
-	else
-	{
-		for (const Node* ptr = tail; ptr != nullptr; ptr = ptr->next)
-		{
-			std::cout << ptr->Element << '\n';
-		}
-	}
-}
-//-------------------------------------------------------------------------------------------------
-template <typename Type>
-const std::optional<Type> & Stack<Type>::top() const
-{
-	if (!empty())
-	{
-		return tail->Element;
-	}
-	return std::nullopt;
+	return tail->element;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
@@ -159,10 +153,11 @@ bool Stack<Type>::empty() const
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-std::ostream & operator << (std::ostream & os, const Stack<Type> & stk)
+void Stack<Type>::swap(Stack & stk)
 {
-	stk.show();
-	return os;
+	Stack temp(stk);
+	stk = std::move(*this);
+	*this = std::move(temp);
 }
 //-------------------------------------------------------------------------------------------------
 #endif // STACK_H_
