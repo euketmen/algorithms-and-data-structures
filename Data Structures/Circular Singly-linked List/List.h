@@ -29,6 +29,11 @@ public:
 	//TODO: Implement in the near future
 
 	//Capacity
+	bool empty() const;
+	size_t size() const;
+	//size_type max_size() const noexcept; Not implemented
+
+	//Modifiers
 	void push_front(const Type & tp);
 	void push_back(const Type & tp);
 	void push_pos(const Type & tp, const size_t & pos);
@@ -249,7 +254,7 @@ void List<Type>::pop_back()
 	if (head->next == head)
 	{
 		delete head;
-		--count
+		--count;
 		head = nullptr;
 		return;
 	}
@@ -258,12 +263,12 @@ void List<Type>::pop_back()
 	Node* n_ptr_prev = nullptr;
 	while (n_ptr_lst->next != head)
 	{
-		n_ptr_prev = n_ptr;
+		n_ptr_prev = n_ptr_lst;
 		n_ptr_lst = n_ptr_lst->next;
 	}
 	n_ptr_prev->next = head;
 	--count;
-	delete n_ptr;
+	delete n_ptr_lst;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
@@ -336,6 +341,12 @@ const Type & List<Type>::back() const
 		n_ptr_lst = n_ptr_lst->next;
 	}
 	return n_ptr_lst->element;
+}
+//-------------------------------------------------------------------------------------------------
+template <typename Type>
+size_t List<Type>::size() const
+{
+	return count;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>

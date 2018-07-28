@@ -35,6 +35,7 @@ public:
 	size_t size() const;
 	//size_type max_size() const noexcept; Not implemented
 
+	//Modifiers
 	void push_front(const Type & tp);
 	void push_back(const Type & tp);
 	void push_pos(const Type & tp, const size_t & pos);
