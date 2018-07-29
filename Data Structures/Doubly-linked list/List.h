@@ -75,6 +75,7 @@ List<Type>::List(const List & lst) : count(lst.count), head(nullptr), tail(nullp
 		{
 			tail->next = n_ptr_new;
 			n_ptr_new->prev = tail;
+			n_ptr_new->next = nullptr;
 			tail = n_ptr_new;
 		}
 	}
