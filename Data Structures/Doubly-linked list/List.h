@@ -56,7 +56,7 @@ public:
 template <typename Type>
 List<Type>::List() : count(0), head(nullptr), tail(nullptr)
 {
-
+	//Body of the constructor class
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>

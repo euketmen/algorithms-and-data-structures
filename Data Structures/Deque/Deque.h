@@ -1,8 +1,8 @@
-#ifndef _QUEUE_H_
-#define _QUEUE_H_
+#ifndef _DEQUE_H_
+#define _DEQUE_H_
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-class Queue
+class Deque
 {
 private:
 	struct Node
@@ -16,38 +16,52 @@ private:
 	Node* tail;
 public:
 	//Member functions
-	Queue();
-	Queue(const Queue & que);
-	Queue(Queue && que);
-	Queue & operator = (const Queue & que);
-	Queue & operator = (Queue && que);
-	~Queue();
+	Deque();
+	Deque(const Deque & deq);
+	Deque(Deque && deq);
+	Deque & operator = (const Deque & deq);
+	Deque & operator = (Deque && deq);
+	~Deque();
 
 	//Element access
+	//const Type & at(Deque pos) const; Not implemented
+	//template <typename Type>
+	//const Type & operator[](size_type pos) const; Not implemented
 	const Type & front() const;
 	const Type & back() const;
+
+	//Iterators
+	//TODO: Implement in the near future 
 
 	//Capacity
 	bool empty() const;
 	size_t size() const;
+	//size_t max_size() const noexcept; Not implemented
 
 	//Modifiers
-	void push(const Type & tp);
-	void pop();
-	void swap(Queue & que) noexcept;
-	//emplace Not implemented
+	void push_front(const Type & tp);
+	void push_back(const Type & tp);
+
+	//void emplace_front(); Not implemented
+	//void emplace_back(); Not implemented
+
+	void pop_front();
+	void pop_back();
+
+	void clear() noexcept;
+	void swap(Deque & deq) noexcept;
 };
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-Queue<Type>::Queue() : count(0), head(nullptr), tail(nullptr)
+Deque<Type>::Deque() : count(0), head(nullptr), tail(nullptr)
 {
 	//Body of the constructor class
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-Queue<Type>::Queue(const Queue & que) : count(que.count), head(nullptr), tail(nullptr)
+Deque<Type>::Deque(const Deque & deq) : count(deq.count), head(nullptr), tail(nullptr)
 {
-	for (const Node* n_ptr = que.head; n_ptr != nullptr; n_ptr = n_ptr->next)
+	for (const Node* n_ptr = deq.head; n_ptr != nullptr; n_ptr = n_ptr->next)
 	{
 		Node* n_ptr_new = new Node;
 		n_ptr_new->element = n_ptr->element;
@@ -67,22 +81,22 @@ Queue<Type>::Queue(const Queue & que) : count(que.count), head(nullptr), tail(nu
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-Queue<Type>::Queue(Queue && que) : count(que.count), head(que.head), tail(que.tail)
+Deque<Type>::Deque(Deque && deq) : count(deq.count), head(deq.head), tail(deq.tail)
 {
-	que.count = 0;
-	que.head = nullptr;
-	que.tail = nullptr;
+	deq.count = 0;
+	deq.head = nullptr;
+	deq.tail = nullptr;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-Queue<Type> & Queue<Type>::operator = (const Queue & que)
+Deque<Type> & Deque<Type>::operator = (const Deque & deq)
 {
-	if (this == &que)
+	if (this == &deq)
 	{
 		return *this;
 	}
 	
-	Queue tmp(que);
+	Deque tmp(deq);
 	std::swap(count, tmp.count);
 	std::swap(head, tmp.head);
 	std::swap(tail, tmp.tail);
@@ -90,21 +104,21 @@ Queue<Type> & Queue<Type>::operator = (const Queue & que)
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-Queue<Type> & Queue<Type>::operator = (Queue && que)
+Deque<Type> & Deque<Type>::operator = (Deque && deq)
 {
-	if (this == &que)
+	if (this == &deq)
 	{
 		return *this;
 	}
 
-	std::swap(count, que.count);
-	std::swap(head, que.head);
-	std::swap(tail, que.tail);
+	std::swap(count, deq.count);
+	std::swap(head, deq.head);
+	std::swap(tail, deq.tail);
 	return *this;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-Queue<Type>::~Queue()
+Deque<Type>::~Deque()
 {
 	while (head)
 	{
@@ -116,7 +130,27 @@ Queue<Type>::~Queue()
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-void Queue<Type>::push(const Type & tp)
+void Deque<Type>::push_front(const Type & tp)
+{
+	Node* n_ptr_new = new Node;
+	n_ptr_new->element = tp;
+	if (head == nullptr && tail == nullptr)
+	{
+		head = n_ptr_new;
+		tail = head;
+	}
+	else
+	{
+		n_ptr_new->next = head;
+		n_ptr_new->prev = nullptr;
+		head->prev = n_ptr_new;
+		head = n_ptr_new;
+	}
+	++count;
+}
+//-------------------------------------------------------------------------------------------------
+template <typename Type>
+void Deque<Type>::push_back(const Type & tp)
 {
 	Node* n_ptr_new = new Node;
 	n_ptr_new->element = tp;
@@ -136,7 +170,7 @@ void Queue<Type>::push(const Type & tp)
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-void Queue<Type>::pop()
+void Deque<Type>::pop_front()
 {
 	if (empty())
 	{
@@ -160,13 +194,37 @@ void Queue<Type>::pop()
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-bool Queue<Type>::empty() const
+void Deque<Type>::pop_back()
+{
+	if (empty())
+	{
+		throw std::out_of_range("Can't pop from empty list");
+	}
+
+	if (head == tail)
+	{
+		delete head;
+		--count;
+		head = nullptr;
+		tail = nullptr;
+		return;
+	}
+
+	Node* n_ptr_del = tail;
+	tail = tail->prev;
+	tail->next = nullptr;
+	--count;
+	delete n_ptr_del;
+}
+//-------------------------------------------------------------------------------------------------
+template <typename Type>
+bool Deque<Type>::empty() const
 {
 	return head == nullptr;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-const Type & Queue<Type>::front() const
+const Type & Deque<Type>::front() const
 {
 	if (empty())
 	{
@@ -176,7 +234,7 @@ const Type & Queue<Type>::front() const
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-const Type & Queue<Type>::back() const
+const Type & Deque<Type>::back() const
 {
 	if (empty())
 	{
@@ -186,17 +244,26 @@ const Type & Queue<Type>::back() const
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-size_t Queue<Type>::size() const
+size_t Deque<Type>::size() const
 {
 	return count;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
-void Queue<Type>::swap(Queue & que) noexcept
+void Deque<Type>::clear() noexcept
 {
-	Queue temp(que);
-	que = std::move(*this);
+	while (count)
+	{
+		pop_back();
+	}
+}
+//-------------------------------------------------------------------------------------------------
+template <typename Type>
+void Deque<Type>::swap(Deque & deq) noexcept
+{
+	Deque temp(deq);
+	deq = std::move(*this);
 	*this = std::move(temp);
 }
 //-------------------------------------------------------------------------------------------------
-#endif // _QUEUE_H_
+#endif // _DEQUE_H_
