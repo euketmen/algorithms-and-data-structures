@@ -43,6 +43,8 @@ public:
 	void pop_back();
 	void pop_pos(const size_t & pos);
 
+	Type operator[](int i);
+
 	//emplace_front Not implemented
 	//emplace_back Not implemented
 	//emplace Not implemented
@@ -93,7 +95,7 @@ List<Type> & List<Type>::operator = (const List & lst)
 	{
 		return *this;
 	}
-	
+
 	List tmp(lst);
 	std::swap(count, tmp.count);
 	std::swap(head, tmp.head);
@@ -184,7 +186,7 @@ void List<Type>::push_pos(const Type & tp, const size_t & pos)
 		Node* n_ptr_prev = nullptr;
 		Node* n_ptr_cur = head;
 		n_ptr_new->element = tp;
-	
+
 		for (size_t i = 0; i < pos; ++i)
 		{
 			n_ptr_prev = n_ptr_cur;
@@ -207,7 +209,7 @@ void List<Type>::pop_front()
 	{
 		throw std::out_of_range("Can't pop from empty list");
 	}
-	
+
 	if (head == tail)
 	{
 		delete head;
@@ -266,11 +268,11 @@ void List<Type>::pop_pos(const size_t & pos)
 		return;
 	}
 	else
-	if (pos == count - 1)
-	{
-		pop_back();
-		return;
-	}
+		if (pos == count - 1)
+		{
+			pop_back();
+			return;
+		}
 
 	if (pos < count && pos > 0)
 	{
@@ -309,7 +311,7 @@ const Type & List<Type>::front() const
 {
 	if (empty())
 	{
-		throw std::out_of_range("List<Type>::top: empty stack");
+		throw std::out_of_range("List<Type>::front empty stack");
 	}
 	return head->element;
 }
@@ -319,9 +321,25 @@ const Type & List<Type>::back() const
 {
 	if (empty())
 	{
-		throw std::out_of_range("List<Type>::top: empty stack");
+		throw std::out_of_range("List<Type>::back empty stack");
 	}
 	return tail->element;
+}
+//-------------------------------------------------------------------------------------------------
+template <typename Type>
+Type List<Type>::operator[](int i)
+{
+	if (i < 0 || i > size() - 1)
+	{
+		throw std::out_of_range("List<Type>::operator[]");
+	}
+
+	Node* n_ptr = head;
+	for (size_t step = 0; step < i; step++)
+	{
+		n_ptr = n_ptr->next;
+	}
+	return n_ptr->element;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
