@@ -43,8 +43,6 @@ public:
 	void pop_back();
 	void pop_pos(const size_t & pos);
 
-	Type operator[](int i);
-
 	//emplace_front Not implemented
 	//emplace_back Not implemented
 	//emplace Not implemented
@@ -324,22 +322,6 @@ const Type & List<Type>::back() const
 		throw std::out_of_range("List<Type>::back empty stack");
 	}
 	return tail->element;
-}
-//-------------------------------------------------------------------------------------------------
-template <typename Type>
-Type List<Type>::operator[](int i)
-{
-	if (i < 0 || i > size() - 1)
-	{
-		throw std::out_of_range("List<Type>::operator[]");
-	}
-
-	Node* n_ptr = head;
-	for (size_t step = 0; step < i; step++)
-	{
-		n_ptr = n_ptr->next;
-	}
-	return n_ptr->element;
 }
 //-------------------------------------------------------------------------------------------------
 template <typename Type>
