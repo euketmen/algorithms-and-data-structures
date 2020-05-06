@@ -14,5 +14,10 @@ Algorithms and data structures implemented in the programming language C ++
 - Fibonacci number --> [Open](Algorithms/Fibonacci%20number/fibonacci.cpp)
 
 **Design patterns**
-*Creational patterns
-- Factory Method --> [Open]()
+* Creational patterns
+
+  + Factory Method --> [Open]()
+  + Abstract Factory --> [Open]()
+  + Builder --> [Open]()
+  + Prototype --> [Open]()
+  + Singleton --> [Open]()
