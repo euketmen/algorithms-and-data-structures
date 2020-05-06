@@ -16,7 +16,7 @@ Algorithms and data structures implemented in the programming language C ++
 **Design patterns**
 * Creational patterns
 
-  + Factory Method --> [Open]()
+  + Factory Method --> [Open](Design%20patterns/Creational%20patterns/factory_method)
   + Abstract Factory --> [Open]()
   + Builder --> [Open]()
   + Prototype --> [Open]()
