@@ -21,3 +21,26 @@ Algorithms and data structures implemented in the programming language C ++
   + Builder --> [Open]()
   + Prototype --> [Open]()
   + Singleton --> [Open]()
+  
+* Structural Design Patterns
+
+  + Adapter --> [Open]()
+  + Bridge --> [Open]()
+  + Composite --> [Open]()
+  + Decorator --> [Open]()
+  + Facade --> [Open]()
+  + Flyweight --> [Open]()
+  + Proxy --> [Open]()
+  
+* Structural Design Patterns
+
+  + Chain of Responsibility --> [Open]()
+  + Command --> [Open]()
+  + Iterator --> [Open]()
+  + Mediator --> [Open]()
+  + Memento --> [Open]()
+  + Observer --> [Open]()
+  + State --> [Open]()
+  + Strategy --> [Open]()
+  + Template method --> [Open]()
+  + Visitor --> [Open]()
