@@ -11,7 +11,8 @@ Algorithms and data structures implemented in the programming language C ++
 - Circular Doubly-linked list --> [Open](Data%20Structures/Circular%20Doubly-linked%20List/List.h)
 
 **Algorithms**
-- Fibonacci number --> [Open](Algorithms/Fibonacci%20number/fibonacci.cpp)
+- Fibonacci number --> [Open](Algorithms/fibonacci%20number/fibonacci.cpp)
+- Greatest common divisor --> [Open](Algorithms/greatest%20common%20divisor/gcd.cpp)
 
 **Design patterns**
 * Creational patterns
