@@ -13,6 +13,7 @@ Algorithms and data structures implemented in the programming language C ++
 **Algorithms**
 - Fibonacci number --> [Open](Algorithms/fibonacci%20number/fibonacci.cpp)
 - Greatest common divisor --> [Open](Algorithms/greatest%20common%20divisor/gcd.cpp)
+- Eratosthenes sieve --> [Open](Algorithms/eratosthenes%20sieve/eratosthenes_sieve.cpp)
 
 **Design patterns**
 * Creational patterns
